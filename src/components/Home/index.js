@@ -5,9 +5,7 @@ import * as ROUTES from '../../routes';
 import './index.scss';
 
 const SignUpPage = () => (
-  <div>
-    <SignUpForm />
-  </div>
+  <div><SignUpForm /></div>
 );
 
 const INITIAL_STATE = {
@@ -29,7 +27,7 @@ class SignUpFormBase extends Component {
       .signUp(email, password)
       .then(response => {
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.ACCOUNT);
+        this.props.history.push(ROUTES.NOTES);
       })
       .catch(error => {
         this.setState({ error });
@@ -45,7 +43,7 @@ class SignUpFormBase extends Component {
       .signIn(email, password)
       .then(response => {
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.ACCOUNT);
+        this.props.history.push(ROUTES.NOTES);
       })
       .catch(error => {
         this.setState({ error });
@@ -61,7 +59,7 @@ class SignUpFormBase extends Component {
     .signInWithGoogle(email, password)
     .then(response => {
       this.setState({ ...INITIAL_STATE });
-      this.props.history.push(ROUTES.ACCOUNT);
+      this.props.history.push(ROUTES.NOTES);
     }).catch(error => {
       this.setState({ error });
     });

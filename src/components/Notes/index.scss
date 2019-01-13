@@ -22,3 +22,27 @@
 .note-body {
   min-height: 500px;
 }
+
+.note-content {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  border: 0;
+  background-color:#209cee;
+  color: white;
+  width: 100%;
+
+  .note-title {
+    font-size: 24px;
+    border-radius: 5px;
+    padding: 5px 15px;
+    background-color: #36a5ef;
+  }
+
+  .note-body {
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #36a5ef;
+  }
+}

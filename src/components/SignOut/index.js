@@ -19,9 +19,6 @@ class SignOutButton extends Component {
       .signOut()
       .then(response => {
         this.setState({ redirect: true })
-
-        // this does not work, whyyy
-        // this.props.history.push(ROUTES.ACCOUNT);
       })
       .catch(error => {
         this.setState({ error });
