@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Navigation from '../Navigation';
 import HomePage from '../Home';
+import NotesPage from '../Notes';
 import AccountPage from '../Account';
 import { Session } from '../Session';
 import { withFirebase } from '../Firebase';
@@ -31,11 +32,12 @@ class App extends Component {
     return (
       <Session.Provider value={this.state.authenticatedUser}>
         <Router>
-          <div className='container has-background-grey-light'>
+          <div>
             <Navigation authenticatedUser={this.state.authenticatedUser}/>
 
             <div className='internal-container'>
               <Route exact path={ROUTES.HOME} component={HomePage} />
+              <Route exact path={ROUTES.NOTES} component={NotesPage} />
               <Route path={ROUTES.ACCOUNT} component={AccountPage} />
             </div>
           </div>
