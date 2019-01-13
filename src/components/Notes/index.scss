@@ -1,0 +1,24 @@
+.columns {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.column {
+  margin: 0 25px;
+  height: 100%;
+  padding: 15px;
+}
+
+.sidebar-header-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.note-list-item {
+  margin-bottom: 15px;
+}
+
+.note-body {
+  min-height: 500px;
+}
