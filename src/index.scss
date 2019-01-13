@@ -1,1 +1,11 @@
+$title-color: white;
+
 @import '~bulma/bulma';
+
+html {
+  background-color: $grey-dark;
+}
+
+body {
+  color: white;
+}
