@@ -1,6 +1,7 @@
 import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
+import 'firebase/storage';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -15,8 +16,9 @@ class Firebase {
   constructor() {
     app.initializeApp(config);
     this.auth = app.auth();
-    this.googleProvider = new app.auth.GoogleAuthProvider();
     this.db = app.database();
+    this.storage = app.storage();
+    this.googleProvider = new app.auth.GoogleAuthProvider();
   }
 
   signUp = (email, password) => (
@@ -50,6 +52,10 @@ class Firebase {
   notes = () => (
     this.db.ref('/notes')
   );
+
+  file = (path) => (
+    this.storage.ref()
+  )
 }
 
 export default Firebase;

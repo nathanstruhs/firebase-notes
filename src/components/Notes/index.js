@@ -75,6 +75,12 @@ class Notes extends Component {
     });
   }
 
+  fileUpload = (event) => {
+    const file = event.target.files[0];
+    const activeNote = this.state.activeNote;
+    this.props.firebase.file().child(`/${activeNote.id}/${file.name}`).put(file);
+  }
+
   noteList = () => {
     const { notes } = this.state;
 
@@ -109,10 +115,27 @@ class Notes extends Component {
         </aside>
       </div>
 
-      <div className='column note-content has-background-info'>
-        <input className='note-content note-title' value={this.state.activeNote.title} onChange={this.onTitleChange} spellcheck='false' autofocus='autofocus' />
+      <div className='column has-background-info'>
+        <div className='note-content'>
+          <input className='note-content note-title' value={this.state.activeNote.title} onChange={this.onTitleChange} spellCheck='false' autoFocus='autofocus' />
+        </div>
+
         <hr />
-        <textarea className='note-content note-body' value={this.state.activeNote.body} onChange={this.onBodyChange} spellcheck='false' />
+
+        <div className='note-content'>
+          <textarea className='note-content note-body' value={this.state.activeNote.body} onChange={this.onBodyChange} spellCheck='false' />
+        </div>
+
+        <div className='field'>
+          <div className='file is-link'>
+            <label className='file-label'>
+              <input className='file-input' type='file' onChange={this.fileUpload}/>
+              <span className='file-cta'>
+                <span className='file-label'>Attach file ✉️</span>
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
     )
