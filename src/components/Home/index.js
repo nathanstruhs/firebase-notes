@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../routes';
+import './index.scss';
 
 const SignUpPage = () => (
-  <div>
-    <SignUpForm />
-  </div>
+  <div><SignUpForm /></div>
 );
 
 const INITIAL_STATE = {
@@ -21,14 +20,14 @@ class SignUpFormBase extends Component {
     this.state = { ...INITIAL_STATE };
   }
 
-  signUp = event => {
+  signUp = (event) => {
     const { email, password } = this.state;
 
     this.props.firebase
       .signUp(email, password)
       .then(response => {
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.ACCOUNT);
+        this.props.history.push(ROUTES.NOTES);
       })
       .catch(error => {
         this.setState({ error });
@@ -44,7 +43,7 @@ class SignUpFormBase extends Component {
       .signIn(email, password)
       .then(response => {
         this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.ACCOUNT);
+        this.props.history.push(ROUTES.NOTES);
       })
       .catch(error => {
         this.setState({ error });
@@ -60,10 +59,12 @@ class SignUpFormBase extends Component {
     .signInWithGoogle(email, password)
     .then(response => {
       this.setState({ ...INITIAL_STATE });
-      this.props.history.push(ROUTES.ACCOUNT);
+      this.props.history.push(ROUTES.NOTES);
     }).catch(error => {
       this.setState({ error });
     });
+
+    event.preventDefault();
   };
 
   onChange = (event) => {
@@ -74,32 +75,34 @@ class SignUpFormBase extends Component {
     const { email, password, error } = this.state;
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <div className='field'>
-          <input className='input' name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
-        </div>
+      <div className='home-container box'>
+        <form onSubmit={this.onSubmit}>
+          <div className='field'>
+            <input className='input' name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
+          </div>
 
-        <div className='field'>
-          <input className='input' name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" />
-        </div>
+          <div className='field'>
+            <input className='input' name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" />
+          </div>
 
-        <div className='field is-grouped'>
-          <p className="control">
-            <button className='button is-link' type="button" onClick={this.signUp}>Sign up</button>
-          </p>
-          <p className="control">
-            <button className='button is-link' type="button" onClick={this.signIn}>Sign in</button>
-          </p>
-        </div>
+          <div className='field is-grouped'>
+            <p className="control">
+              <button className='button is-info' type="button" onClick={this.signUp}>Sign up</button>
+            </p>
+            <p className="control">
+              <button className='button is-info' type="button" onClick={this.signIn}>Sign in</button>
+            </p>
+          </div>
 
-        <hr />
+          <hr />
 
-        <div className='field'>
-          <button className='button is-danger' type="button" onClick={this.signInGoogle}>Sign in with Google</button>
-        </div>
+          <div className='field'>
+            <button className='button is-danger' type="button" onClick={this.signInGoogle}>Sign in with Google</button>
+          </div>
 
-        {error && <p>{error.message}</p>}
-      </form>
+          {error && <p>{error.message}</p>}
+        </form>
+      </div>
     );
   }
 }

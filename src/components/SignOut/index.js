@@ -19,9 +19,6 @@ class SignOutButton extends Component {
       .signOut()
       .then(response => {
         this.setState({ redirect: true })
-
-        // this does not work, whyyy
-        // this.props.history.push(ROUTES.ACCOUNT);
       })
       .catch(error => {
         this.setState({ error });
@@ -36,7 +33,13 @@ class SignOutButton extends Component {
     }
 
     return (
-      <a className="navbar-item" onClick={this.signOut}>Sign Out</a>
+      <div className='navbar-item'>
+        <div className='field'>
+          <p className='control'>
+            <a className='navbar-item button is-info is-outlined' onClick={this.signOut}>Sign Out</a>
+          </p>
+        </div>
+      </div>
     )
   }
 }

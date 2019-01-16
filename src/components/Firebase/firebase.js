@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/database';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -13,9 +14,9 @@ const config = {
 class Firebase {
   constructor() {
     app.initializeApp(config);
-
     this.auth = app.auth();
     this.googleProvider = new app.auth.GoogleAuthProvider();
+    this.db = app.database();
   }
 
   signUp = (email, password) => (
@@ -32,6 +33,22 @@ class Firebase {
 
   signOut = () => (
     this.auth.signOut()
+  );
+
+  user = (uuid) => (
+    this.db.ref(`users/${uuid}`)
+  );
+
+  users = () => (
+    this.db.ref('users')
+  );
+
+  note = (uuid) => (
+    this.db.ref(`notes/${uuid}`)
+  )
+
+  notes = () => (
+    this.db.ref('/notes')
   );
 }
 
