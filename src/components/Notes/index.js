@@ -4,8 +4,9 @@ import uuid from 'uuid/v4';
 import './index.scss';
 
 const INITIAL_STATE = {
+  currentUser: {},
   activeNote: {},
-  notes: [],
+  notes: {},
   loading: false,
   uploading: false,
   uploadingProgress: 0
@@ -18,41 +19,54 @@ class Notes extends Component {
   }
 
   componentDidMount() {
-    this.props.firebase.notes().on('value', snapShot => {
-      const notes = snapShot.val();
-      this.setState({ notes, loaded: true });
-      if (Object.keys(notes).length !== 0) {
-        const id = Object.keys(notes)[0];
-        const { title, body, attachmentURL } = notes[id];
-        this.setState({ activeNote: { id, title, body, attachmentURL }});
+    this.props.firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ currentUser: user });
+
+        this.props.firebase.db.ref(`users/${user.uid}/notes`).on('value', snapShot => {
+          const notes = snapShot.val();
+          this.setState({ notes, loaded: true });
+          if (notes) {
+            if (Object.keys(notes).length !== 0) {
+              const id = Object.keys(notes)[0];
+              const { title, body, attachmentURL } = notes[id];
+              this.setState({ activeNote: { id, title, body, attachmentURL }});
+            }
+          }
+        });
       }
     });
   }
 
   noteList = () => {
     const { notes } = this.state;
-
-    return (
-      <ul className='menu-list'>
-        { Object.keys(notes).map((a, i) => {
-          const note = notes[a];
-          return (
-            <li key={i}>
-              <div className='columns'>
-                <a className='note-list-item column' onClick={() => this.setCurrentNote(note)}>{note.title}</a>
-                <a className='button is-small is-link is-inverted is-outlined note-list-item column is-narrow' onClick={() => this.deleteNote(note.id)}>Delete</a>
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-    );
+    if (notes) {
+      if (Object.keys(notes).length > 0) {
+        return (
+          <ul className='menu-list'>
+            { Object.keys(notes).map((a, i) => {
+              const note = notes[a];
+              return (
+                <li key={i}>
+                  <div className='columns'>
+                    <a className='note-list-item column' onClick={() => this.setCurrentNote(note)}>{note.title}</a>
+                    <a className='button is-small is-link is-inverted is-outlined note-list-item column is-narrow' onClick={() => this.deleteNote(note.id)}>Delete</a>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        );
+      }
+    }
   };
 
   newNote = () => {
     const id = uuid();
+    const userId = this.state.currentUser.uid;
     const newNote = { id, title: 'New Note', body: 'Add yer content..', attachmentURL: '' }
-    this.props.firebase.note(id)
+
+    this.props.firebase.db.ref(`users/${userId}/notes/${id}`)
       .set({ ...newNote }, (error) => {
         if (error) {
           console.log(error);
@@ -67,10 +81,13 @@ class Notes extends Component {
   }
 
   onTitleChange = (event) => {
+    const userId = this.state.currentUser.uid;
+
     const activeNote = { ...this.state.activeNote }
     activeNote.title = event.target.value;
 
-    this.props.firebase.note(activeNote.id)
+    this.props.firebase.db.ref(`users/${userId}/notes/${activeNote.id}`)
+
       .update({ title: event.target.value }, (error) => {
         if (error) { console.log(error) }
       });
@@ -79,10 +96,12 @@ class Notes extends Component {
   }
 
   onBodyChange = (event) => {
+    const userId = this.state.currentUser.uid;
+
     const activeNote = { ...this.state.activeNote }
     activeNote.body = event.target.value;
 
-    this.props.firebase.note(activeNote.id)
+    this.props.firebase.db.ref(`users/${userId}/notes/${activeNote.id}`)
       .update({ body: event.target.value }, (error) => {
         if (error) { console.log(error) }
       });
@@ -91,17 +110,21 @@ class Notes extends Component {
   }
 
   deleteNote = (id) => {
-    this.props.firebase.note(id)
+    const userId = this.state.currentUser.uid;
+
+    this.props.firebase.db.ref(`users/${userId}/notes/${id}`)
       .remove((error) => {
         if (error) { console.log(error) }
     });
   }
 
   fileUpload = (event) => {
+    const userId = this.state.currentUser.uid;
+
     const file = event.target.files[0];
     const activeNote = { ...this.state.activeNote };
 
-    this.props.firebase.file().child(`/${activeNote.id}/${file.name}`).put(file)
+    this.props.firebase.file().child(`/users/${userId}/${activeNote.id}/${file.name}`).put(file)
     .on('state_changed',
       (snapshot) => {
         let progress = (snapshot.bytesTransferred/snapshot.totalBytes) * 100;
@@ -111,7 +134,7 @@ class Notes extends Component {
         console.log(error)
       },
       () => {
-        this.props.firebase.file().child(`/${activeNote.id}/${file.name}`).getDownloadURL()
+        this.props.firebase.file().child(`/users/${userId}/${activeNote.id}/${file.name}`).getDownloadURL()
         .then(url => {
           this.updateAttachmentURL(url);
         });
@@ -126,9 +149,10 @@ class Notes extends Component {
   }
 
   updateAttachmentURL = (url) => {
+    const userId = this.state.currentUser.uid;
     const activeNote = { ...this.state.activeNote };
     activeNote.attachmentURL = url;
-    this.props.firebase.note(activeNote.id)
+    this.props.firebase.db.ref(`users/${userId}/notes/${activeNote.id}`)
       .update({ attachmentURL: url }, (error) => {
         if (error) { console.log(error) }});
     this.setState({ activeNote })
@@ -136,6 +160,7 @@ class Notes extends Component {
 
   attachment = () => {
     const attachmentURL = this.state.activeNote.attachmentURL;
+
     if (attachmentURL !== '') {
       return (
         <div className='attachment'>
@@ -152,7 +177,7 @@ class Notes extends Component {
       <div className='column has-background-info is-one-third'>
         <aside className='menu'>
           <div className='sidebar-header-container'>
-            <h2 className='menu-label title is-3'>Ya Notes Boy</h2>
+            <h2 className='menu-label title is-3'>All Notes</h2>
             <button className='button is-info is-inverted' onClick={this.newNote}>New Note +</button>
           </div>
           <hr />
@@ -169,7 +194,7 @@ class Notes extends Component {
 
         <div className='note-content'>
           <textarea className='note-content note-body' value={this.state.activeNote.body} onChange={this.onBodyChange} spellCheck='false' />
-          { this.state.loaded ? this.attachment() : null }
+          { (this.state.loaded && this.state.activeNote.attachmentURL) ? this.attachment() : null }
         </div>
 
         { this.state.uploading ? this.progressBar() : null }
