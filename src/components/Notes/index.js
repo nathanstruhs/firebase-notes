@@ -6,7 +6,9 @@ import './index.scss';
 const INITIAL_STATE = {
   activeNote: {},
   notes: [],
-  loading: false
+  loading: false,
+  uploading: false,
+  uploadingProgress: 0
 }
 
 class Notes extends Component {
@@ -81,14 +83,26 @@ class Notes extends Component {
 
     this.props.firebase.file().child(`/${activeNote.id}/${file.name}`).put(file)
     .on('state_changed',
-      (snapshot) => { console.log(`Upload is ${snapshot.bytesTransferred/snapshot.totalBytes}% done`) },
-      (error) => { console.log(error) },
+      (snapshot) => {
+        let progress = (snapshot.bytesTransferred/snapshot.totalBytes) * 100;
+        this.setState({ uploading: true, uploadingProgress: progress });
+      },
+      (error) => {
+        console.log(error)
+      },
       () => {
         this.props.firebase.file().child(`/${activeNote.id}/${file.name}`).getDownloadURL()
         .then(url => {
           this.updateAttachmentURL(url);
         });
+        this.setState({ uploading: false })
     });
+  }
+
+  progressBar = () => {
+    return (
+      <progress class='progress' value={this.state.uploadingProgress} max='100'></progress>
+    )
   }
 
   updateAttachmentURL = (url) => {
@@ -158,6 +172,8 @@ class Notes extends Component {
           <textarea className='note-content note-body' value={this.state.activeNote.body} onChange={this.onBodyChange} spellCheck='false' />
           { this.state.loaded ? this.attachment() : null }
         </div>
+
+        { this.state.uploading ? this.progressBar() : null }
 
         <div className='field'>
           <div className='file is-link'>
