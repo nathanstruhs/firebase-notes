@@ -29,6 +29,26 @@ class Notes extends Component {
     });
   }
 
+  noteList = () => {
+    const { notes } = this.state;
+
+    return (
+      <ul className='menu-list'>
+        { Object.keys(notes).map((a, i) => {
+          const note = notes[a];
+          return (
+            <li key={i}>
+              <div className='columns'>
+                <a className='note-list-item column' onClick={() => this.setCurrentNote(note)}>{note.title}</a>
+                <a className='button is-small is-link is-inverted is-outlined note-list-item column is-narrow' onClick={() => this.deleteNote(note.id)}>Delete</a>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    );
+  };
+
   newNote = () => {
     const id = uuid();
     const newNote = { id, title: 'New Note', body: 'Add yer content..', attachmentURL: '' }
@@ -101,7 +121,7 @@ class Notes extends Component {
 
   progressBar = () => {
     return (
-      <progress class='progress' value={this.state.uploadingProgress} max='100'></progress>
+      <progress className='progress' value={this.state.uploadingProgress} max='100'></progress>
     )
   }
 
@@ -122,30 +142,9 @@ class Notes extends Component {
           <img src={attachmentURL} alt='attachment' />
           <a href={attachmentURL} className='open-link' target='_blank' download>Open</a>
         </div>
-
       );
     }
   }
-
-  noteList = () => {
-    const { notes } = this.state;
-
-    return (
-      <ul className='menu-list'>
-        { Object.keys(notes).map((a, i) => {
-          const note = notes[a];
-          return (
-            <li key={i}>
-              <div className='columns'>
-                <a className='note-list-item column' onClick={() => this.setCurrentNote(note)}>{note.title}</a>
-                <a className='button is-small is-link is-inverted is-outlined note-list-item column is-narrow' onClick={() => this.deleteNote(note.id)}>Delete</a>
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-    );
-  };
 
   render() {
     return(
