@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "notes": {
+    	".read": "auth != null",
+    	".write": "auth != null"
+     },
+    "account": {
+    	".read": "auth != null",
+    	".write": "auth != null"
+     }
+   }
+}
